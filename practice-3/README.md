@@ -27,6 +27,9 @@ int main(void) {
     return 0;
 }
 
+<img width="973" height="507" alt="Снимок экрана 2026-03-28 140018" src="https://github.com/user-attachments/assets/3fddefd5-476c-4553-83e2-46ca4850aac6" />
+
+
 Задание 3.2: Сумма ряда **
 Вычислите сумму гармонического ряда
 
@@ -58,6 +61,10 @@ int main() {
 
     return 0;
 }
+
+<img width="977" height="507" alt="Снимок экрана 2026-03-28 140434" src="https://github.com/user-attachments/assets/c0a52919-479d-4abf-894b-0cfb83e5b926" />
+
+
 
 Задание 3.3: Числа Фибоначчи **
 Выведите первые N чисел Фибоначчи.
@@ -91,6 +98,9 @@ int main() {
     return 0;
 }
 
+<img width="982" height="507" alt="Снимок экрана 2026-03-28 140956" src="https://github.com/user-attachments/assets/adff2a75-e825-43d6-b726-8710c8c16b9f" />
+
+
 Задание 3.4: Среднее арифметическое *
 Напишите программу, которая:
 1 Запрашивает 5 чисел с клавиатуры
@@ -116,6 +126,9 @@ int main() {
 
     return 0;
 }
+
+<img width="984" height="517" alt="Снимок экрана 2026-03-28 141411" src="https://github.com/user-attachments/assets/28c5aa11-b738-4ed5-86fd-fc056c1a5617" />
+
 
 Задание 3.5: Минимум и максимум **
 Напишите программу, которая находит минимальный и максимальный элементы массива из 10
@@ -150,6 +163,9 @@ int main() {
 
     return 0;
 }
+
+<img width="984" height="513" alt="Снимок экрана 2026-03-28 141747" src="https://github.com/user-attachments/assets/e3e1a60a-5172-492b-8bc7-c0b223857e35" />
+
 
 Задание 3.6: Реверс массива **
 Напишите программу, которая переворачивает массив “на месте” (без создания нового массива).
