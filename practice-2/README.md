@@ -43,6 +43,9 @@ printf("h(%.2lf) = %.6lf\n", x, h);
 return 0;
 }
 
+<img width="978" height="504" alt="Снимок экрана 2026-03-27 175531" src="https://github.com/user-attachments/assets/e96bc1ae-4e75-4f8b-a765-b53605e1ed72" />
+
+
 Задание 2.2: Чётное или нечётное *
 Напишите программу, которая определяет, является ли введённое число чётным или нечётным.
 
@@ -64,6 +67,9 @@ int main() {
 
     return 0;
 }
+
+<img width="972" height="503" alt="Снимок экрана 2026-03-27 175448" src="https://github.com/user-attachments/assets/d4be9c99-5958-46f5-aa4c-6f3055896863" />
+
 
 Задание 2.3: Максимум из трёх **
 Напишите программу, которая находит максимальное из трёх введённых чисел.
@@ -90,6 +96,9 @@ int main(void) {
 
     return 0;
 }
+
+<img width="984" height="515" alt="Снимок экрана 2026-03-27 180200" src="https://github.com/user-attachments/assets/bd16aa13-84fc-4c07-bc0f-20fa54b57e8d" />
+
 
 Задание 2.4: Тип треугольника **
 Напишите программу, которая по трём сторонам определяет тип треугольника:
@@ -124,6 +133,9 @@ int main(void) {
 
     return 0;
 }
+
+<img width="984" height="513" alt="Снимок экрана 2026-03-27 180940" src="https://github.com/user-attachments/assets/f329ba57-8698-437d-9a6c-53b091ab8c36" />
+
 
 Задание 2.5: Квадратное уравнение ***
 Напишите программу для решения квадратного уравнения 2 + + = 0:
@@ -166,6 +178,9 @@ int main() {
 
     return 0;
 }
+
+<img width="986" height="516" alt="Снимок экрана 2026-03-27 181408" src="https://github.com/user-attachments/assets/ada08f85-92e1-4ca1-82a3-cb0592abaeae" />
+
 
 Задание 2.6: Калькулятор **
 Напишите программу-калькулятор, которая:
@@ -216,3 +231,6 @@ int main(void) {
 
     return 0;
 }
+
+<img width="981" height="514" alt="Снимок экрана 2026-03-27 181846" src="https://github.com/user-attachments/assets/ae887c05-b058-4cae-a82d-7bd24aeed367" />
+
