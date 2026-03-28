@@ -190,6 +190,9 @@ int main() {
 
     return 0;
 }
+
+
+
 <img width="981" height="512" alt="Снимок экрана 2026-03-28 142149" src="https://github.com/user-attachments/assets/d9e0c490-3622-4f5a-9bc0-596f8c1783e8" />
 
 
