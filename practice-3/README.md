@@ -186,10 +186,11 @@ int main() {
     for (int i = 0; i < 5; i++) {
         printf("%d ", arr[i]);
     }
-
-    <img width="981" height="512" alt="Снимок экрана 2026-03-28 142149" src="https://github.com/user-attachments/assets/3b7c087f-2a8c-4a96-855d-5a1cb018c5e0" />
-
     printf("\n");
 
     return 0;
 }
+<img width="981" height="512" alt="Снимок экрана 2026-03-28 142149" src="https://github.com/user-attachments/assets/d9e0c490-3622-4f5a-9bc0-596f8c1783e8" />
+
+
+
