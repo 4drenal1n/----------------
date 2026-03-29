@@ -18,30 +18,30 @@
 
 ### Код программы
 
-#include <stdio.h>
-#include <math.h>
+    #include <stdio.h>
+    #include <math.h>
+    
+    
+    int main(void) {
+    // Шаг 1: Объявляем константы
+    double a = 0.12, b = 3.5, c = 2.4, x = 1.4;
+    
+    // Шаг 2: Вычисляем ПЕРВУЮ дробь
+    double num1 = x - a; // числитель: (x - a)
+    double denom1 = pow(x*x + a*a, 1.0/3.0); // знаменатель: ∛(x² + a²)
+    double term1 = num1 / denom1; // первая дробь
+    // Шаг 3: Вычисляем ВТОРУЮ дробь
+    
+    double num2 = pow(pow(x*x + b*b, 3), 1.0/4.0); // числитель: ∜((x² + b²)³)
+    // Или можно записать проще: pow(x*x + b*b, 3.0/4.0)
+    double denom2 = 2 + a + b + pow(pow(x - c, 2), 1.0/3.0); // знаменатель
+    double term2 = num2 / denom2; // вторая дробь
+    // Шаг 4: Собираем результат
 
-
-int main(void) {
-// Шаг 1: Объявляем константы
-double a = 0.12, b = 3.5, c = 2.4, x = 1.4;
-
-// Шаг 2: Вычисляем ПЕРВУЮ дробь
-double num1 = x - a; // числитель: (x - a)
-double denom1 = pow(x*x + a*a, 1.0/3.0); // знаменатель: ∛(x² + a²)
-double term1 = num1 / denom1; // первая дробь
-// Шаг 3: Вычисляем ВТОРУЮ дробь
-
-double num2 = pow(pow(x*x + b*b, 3), 1.0/4.0); // числитель: ∜((x² + b²)³)
-// Или можно записать проще: pow(x*x + b*b, 3.0/4.0)
-double denom2 = 2 + a + b + pow(pow(x - c, 2), 1.0/3.0); // знаменатель
-double term2 = num2 / denom2; // вторая дробь
-// Шаг 4: Собираем результат
-
-double h = -term1 - term2;
-printf("h(%.2lf) = %.6lf\n", x, h);
-return 0;
-}
+    double h = -term1 - term2;
+    printf("h(%.2lf) = %.6lf\n", x, h);
+    return 0;
+    }
 
 <img width="978" height="504" alt="Снимок экрана 2026-03-27 175531" src="https://github.com/user-attachments/assets/e96bc1ae-4e75-4f8b-a765-b53605e1ed72" />
 
@@ -51,10 +51,10 @@ return 0;
 
 ### Код программы
 
-#include <stdio.h>
-
-int main() {
-    int number;
+    #include <stdio.h>
+    
+    int main() {
+        int number;
 
     printf("Enter number: ");
     scanf("%d", &number);
@@ -66,7 +66,7 @@ int main() {
     }
 
     return 0;
-}
+    }
 
 <img width="972" height="503" alt="Снимок экрана 2026-03-27 175448" src="https://github.com/user-attachments/assets/d4be9c99-5958-46f5-aa4c-6f3055896863" />
 
@@ -76,10 +76,10 @@ int main() {
 
 ### Код программы
 
-#include <stdio.h>
-
-int main(void) {
-    int a, b, c, max;
+    #include <stdio.h>
+    
+    int main(void) {
+        int a, b, c, max;
 
     printf("Enter three numbers: ");
     scanf("%d %d %d", &a, &b, &c);
@@ -95,7 +95,7 @@ int main(void) {
     printf("Maximum: %d\n", max);
 
     return 0;
-}
+    }
 
 <img width="984" height="515" alt="Снимок экрана 2026-03-27 180200" src="https://github.com/user-attachments/assets/bd16aa13-84fc-4c07-bc0f-20fa54b57e8d" />
 
@@ -109,10 +109,10 @@ int main(void) {
 
 ### Код программы
 
-#include <stdio.h>
-
-int main(void) {
-    int a, b, c;
+    #include <stdio.h>
+    
+    int main(void) {
+        int a, b, c;
 
     printf("Enter sides a, b, c: ");
     scanf("%d %d %d", &a, &b, &c);
@@ -132,7 +132,7 @@ int main(void) {
     }
 
     return 0;
-}
+    }
 
 <img width="984" height="513" alt="Снимок экрана 2026-03-27 180940" src="https://github.com/user-attachments/assets/f329ba57-8698-437d-9a6c-53b091ab8c36" />
 
@@ -148,11 +148,11 @@ int main(void) {
 
 ### Код программы
 
-#include <stdio.h>
-#include <math.h>
-
-int main() {
-    double a, b, c, discriminant, root1, root2;
+    #include <stdio.h>
+    #include <math.h>
+    
+    int main() {
+        double a, b, c, discriminant, root1, root2;
 
     printf("Enter a, b, c: ");
     scanf("%lf %lf %lf", &a, &b, &c);
@@ -177,7 +177,7 @@ int main() {
     }
 
     return 0;
-}
+    }
 
 <img width="986" height="516" alt="Снимок экрана 2026-03-27 181408" src="https://github.com/user-attachments/assets/ada08f85-92e1-4ca1-82a3-cb0592abaeae" />
 
@@ -191,11 +191,11 @@ int main() {
 
 ### Код программы
 
-#include <stdio.h>
-
-int main(void) {
-    double num1, num2, result;
-    char op;
+    #include <stdio.h>
+    
+    int main(void) {
+        double num1, num2, result;
+        char op;
 
     printf("Enter first number: ");
     scanf("%lf", &num1);
@@ -230,7 +230,7 @@ int main(void) {
     }
 
     return 0;
-}
+    }
 
 <img width="981" height="514" alt="Снимок экрана 2026-03-27 181846" src="https://github.com/user-attachments/assets/ae887c05-b058-4cae-a82d-7bd24aeed367" />
 
