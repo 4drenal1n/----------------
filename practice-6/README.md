@@ -220,6 +220,7 @@
 
     return 0;
     }
+<img width="981" height="509" alt="Снимок экрана 2026-03-29 154859" src="https://github.com/user-attachments/assets/b222155c-fa47-48a1-aa86-4e0f8ec3fca3" />
 
 Задание 6.2: Геометрические фигуры (Tagged Union)
 Реализуйте систему для работы с различными геометрическими фигурами.
@@ -658,6 +659,7 @@
 
     return 0;
     }
+<img width="974" height="511" alt="Снимок экрана 2026-03-29 160559" src="https://github.com/user-attachments/assets/60a4fb69-ee9d-4b3b-87b4-5efcbe5c819c" />
 
 Задание 6.3: Выражения калькулятора (AST)
 Реализуйте структуру данных для представления математических выражений.
@@ -1436,21 +1438,1136 @@
     
     return 0;
     }
+<img width="982" height="510" alt="Снимок экрана 2026-03-29 163759" src="https://github.com/user-attachments/assets/51a1f823-7bb0-4e3a-9c46-02ef5056fe46" />
 
 Задание 6.4: Система сообщений (Protocol Buffers style)
 Реализуйте систему обмена сообщениями различных типов.
 
 ### Код программы
 
+    #define _CRT_SECURE_NO_WARNINGS
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+    #include <time.h>
+    #include <windows.h>
+    
+    // Типы сообщений
+    typedef enum {
+        MSG_TEXT,
+        MSG_IMAGE,
+        MSG_FILE,
+        MSG_LOCATION,
+        MSG_AUDIO
+    } MessageType;
+    
+    // Текстовое сообщение
+    typedef struct {
+        char content[500];
+        int is_edited;
+    } TextMessage;
+    
+    // Изображение
+    typedef struct {
+        char filename[100];
+        int width;
+        int height;
+        size_t size_bytes;
+    } ImageMessage;
+    
+    // Файл
+    typedef struct {
+        char filename[100];
+        char mime_type[50];
+        size_t size_bytes;
+    } FileMessage;
+    
+    // Локация
+    typedef struct {
+        double latitude;
+        double longitude;
+        char address[200];
+    } LocationMessage;
+    
+    // Аудио
+    typedef struct {
+        char filename[100];
+        int duration_seconds;
+        size_t size_bytes;
+    } AudioMessage;
+    
+    // Сообщение с tagged union
+    typedef struct {
+        unsigned int id;
+        unsigned int sender_id;
+        unsigned int chat_id;
+        time_t timestamp;
+        MessageType type;
+        union {
+            TextMessage text;
+            ImageMessage image;
+            FileMessage file;
+            LocationMessage location;
+            AudioMessage audio;
+        } content;
+    } Message;
+    
+    //сообщения
+    
+    Message create_text_message(unsigned int sender, unsigned int chat, const char *text) {
+        Message msg = {0};
+        msg.id = rand() % 100000;
+        msg.sender_id = sender;
+        msg.chat_id = chat;
+        msg.timestamp = time(NULL);
+        msg.type = MSG_TEXT;
+        strncpy(msg.content.text.content, text, sizeof(msg.content.text.content) - 1);
+        msg.content.text.is_edited = 0;
+        return msg;
+    }
+    
+    Message create_image_message(unsigned int sender, unsigned int chat,
+                                 const char *filename, int w, int h, size_t size) {
+        Message msg = {0};
+        msg.id = rand() % 100000;
+        msg.sender_id = sender;
+        msg.chat_id = chat;
+        msg.timestamp = time(NULL);
+        msg.type = MSG_IMAGE;
+        strncpy(msg.content.image.filename, filename, sizeof(msg.content.image.filename) - 1);
+        msg.content.image.width = w;
+        msg.content.image.height = h;
+        msg.content.image.size_bytes = size;
+        return msg;
+    }
+    
+    Message create_file_message(unsigned int sender, unsigned int chat,
+                                const char *filename, const char *mime, size_t size) {
+        Message msg = {0};
+        msg.id = rand() % 100000;
+        msg.sender_id = sender;
+        msg.chat_id = chat;
+        msg.timestamp = time(NULL);
+        msg.type = MSG_FILE;
+        strncpy(msg.content.file.filename, filename, sizeof(msg.content.file.filename) - 1);
+        strncpy(msg.content.file.mime_type, mime, sizeof(msg.content.file.mime_type) - 1);
+        msg.content.file.size_bytes = size;
+        return msg;
+    }
+    
+    Message create_location_message(unsigned int sender, unsigned int chat,
+                                    double lat, double lon, const char *address) {
+        Message msg = {0};
+        msg.id = rand() % 100000;
+        msg.sender_id = sender;
+        msg.chat_id = chat;
+        msg.timestamp = time(NULL);
+        msg.type = MSG_LOCATION;
+        msg.content.location.latitude = lat;
+        msg.content.location.longitude = lon;
+        strncpy(msg.content.location.address, address, sizeof(msg.content.location.address) - 1);
+        return msg;
+    }
+    
+    Message create_audio_message(unsigned int sender, unsigned int chat,
+                                 const char *filename, int duration, size_t size) {
+        Message msg = {0};
+        msg.id = rand() % 100000;
+        msg.sender_id = sender;
+        msg.chat_id = chat;
+        msg.timestamp = time(NULL);
+        msg.type = MSG_AUDIO;
+        strncpy(msg.content.audio.filename, filename, sizeof(msg.content.audio.filename) - 1);
+        msg.content.audio.duration_seconds = duration;
+        msg.content.audio.size_bytes = size;
+        return msg;
+    }
+    
+    // Сериализация 
+    
+    size_t message_serialize(const Message *msg, unsigned char *buffer, size_t buffer_size) {
+        if (!msg || !buffer) return 0;
+
+    size_t offset = 0;
+    size_t content_size = 0;
+
+    // Определяем размер контента в зависимости от типа
+    switch (msg->type) {
+        case MSG_TEXT:
+            content_size = sizeof(TextMessage);
+            break;
+        case MSG_IMAGE:
+            content_size = sizeof(ImageMessage);
+            break;
+        case MSG_FILE:
+            content_size = sizeof(FileMessage);
+            break;
+        case MSG_LOCATION:
+            content_size = sizeof(LocationMessage);
+            break;
+        case MSG_AUDIO:
+            content_size = sizeof(AudioMessage);
+            break;
+        default:
+            return 0;
+    }
+
+    size_t total_size = 4 + 4 + 4 + 8 + 4 + 8 + content_size;
+    if (total_size > buffer_size) return 0;
+
+    // Копируем заголовок
+    memcpy(buffer + offset, &msg->id, 4); offset += 4;
+    memcpy(buffer + offset, &msg->sender_id, 4); offset += 4;
+    memcpy(buffer + offset, &msg->chat_id, 4); offset += 4;
+    memcpy(buffer + offset, &msg->timestamp, 8); offset += 8;
+    memcpy(buffer + offset, &msg->type, 4); offset += 4;
+    memcpy(buffer + offset, &content_size, sizeof(content_size)); offset += sizeof(content_size);
+
+    // Копируем контент
+    memcpy(buffer + offset, &msg->content, content_size);
+    offset += content_size;
+
+    return offset;
+    }
+    
+    //Десериализация 
+    
+    int message_deserialize(const unsigned char *buffer, size_t size, Message *msg) {
+        if (!buffer || !msg || size < 32) return -1;
+
+    size_t offset = 0;
+
+    memcpy(&msg->id, buffer + offset, 4); offset += 4;
+    memcpy(&msg->sender_id, buffer + offset, 4); offset += 4;
+    memcpy(&msg->chat_id, buffer + offset, 4); offset += 4;
+    memcpy(&msg->timestamp, buffer + offset, 8); offset += 8;
+    memcpy(&msg->type, buffer + offset, 4); offset += 4;
+
+    size_t content_size;
+    memcpy(&content_size, buffer + offset, sizeof(content_size)); offset += sizeof(content_size);
+
+    if (offset + content_size > size) {
+        return -1;
+    }
+
+    // Проверяем тип и копируем контент
+    switch (msg->type) {
+        case MSG_TEXT:
+            if (content_size != sizeof(TextMessage)) return -1;
+            memcpy(&msg->content.text, buffer + offset, content_size);
+            break;
+        case MSG_IMAGE:
+            if (content_size != sizeof(ImageMessage)) return -1;
+            memcpy(&msg->content.image, buffer + offset, content_size);
+            break;
+        case MSG_FILE:
+            if (content_size != sizeof(FileMessage)) return -1;
+            memcpy(&msg->content.file, buffer + offset, content_size);
+            break;
+        case MSG_LOCATION:
+            if (content_size != sizeof(LocationMessage)) return -1;
+            memcpy(&msg->content.location, buffer + offset, content_size);
+            break;
+        case MSG_AUDIO:
+            if (content_size != sizeof(AudioMessage)) return -1;
+            memcpy(&msg->content.audio, buffer + offset, content_size);
+            break;
+        default:
+            return -1;
+    }
+
+    return 0;
+    }
+    
+    // Вывод сообщения 
+    
+    const char* get_type_name(MessageType type) {
+        switch (type) {
+            case MSG_TEXT: return "Текст";
+            case MSG_IMAGE: return "Изображение";
+            case MSG_FILE: return "Файл";
+            case MSG_LOCATION: return "Локация";
+            case MSG_AUDIO: return "Аудио";
+            default: return "Неизвестно";
+        }
+    }
+    
+    void message_print(const Message *msg) {
+        if (!msg) return;
+
+    struct tm *tm_info = localtime(&msg->timestamp);
+    char time_str[20];
+    strftime(time_str, sizeof(time_str), "%H:%M", tm_info);
+
+    printf("[%s] User#%u: ", time_str, msg->sender_id);
+
+    switch (msg->type) {
+        case MSG_TEXT:
+            printf("%s%s", msg->content.text.content,
+                   msg->content.text.is_edited ? " (изменено)" : "");
+            break;
+        case MSG_IMAGE:
+            printf("[Изображение: %s (%dx%d, %.1f MB)]",
+                   msg->content.image.filename,
+                   msg->content.image.width,
+                   msg->content.image.height,
+                   msg->content.image.size_bytes / (1024.0 * 1024.0));
+            break;
+        case MSG_FILE:
+            printf("[Файл: %s (%s, %.1f KB)]",
+                   msg->content.file.filename,
+                   msg->content.file.mime_type,
+                   msg->content.file.size_bytes / 1024.0);
+            break;
+        case MSG_LOCATION:
+            printf("[Локация: %.4f, %.4f - %s]",
+                   msg->content.location.latitude,
+                   msg->content.location.longitude,
+                   msg->content.location.address);
+            break;
+        case MSG_AUDIO:
+            printf("[Аудио: %s (%d:%02d, %.1f KB)]",
+                   msg->content.audio.filename,
+                   msg->content.audio.duration_seconds / 60,
+                   msg->content.audio.duration_seconds % 60,
+                   msg->content.audio.size_bytes / 1024.0);
+            break;
+    }
+    printf("\n");
+    }
+    
+    //Фильтрация сообщений 
+    
+    size_t filter_messages_by_type(const Message *messages, size_t count,
+                                   MessageType type, Message *result) {
+        size_t found = 0;
+        for (size_t i = 0; i < count; i++) {
+            if (messages[i].type == type) {
+                result[found++] = messages[i];
+            }
+        }
+        return found;
+    }
+    
+    size_t filter_messages_by_sender(const Message *messages, size_t count,
+                                     unsigned int sender_id, Message *result) {
+        size_t found = 0;
+        for (size_t i = 0; i < count; i++) {
+            if (messages[i].sender_id == sender_id) {
+                result[found++] = messages[i];
+            }
+        }
+        return found;
+    }
+    
+    //Демонстрация 
+    
+    int main() {
+        SetConsoleOutputCP(CP_UTF8);
+        SetConsoleCP(CP_UTF8);
+
+    srand((unsigned int)time(NULL));
+
+    printf("=== Система сообщений (Protocol Buffers style) ===\n\n");
+
+    // Создаём сообщения разных типов
+    Message msg1 = create_text_message(1, 42, "Привет! Как дела?");
+    Message msg2 = create_text_message(2, 42, "Отлично! Смотри что нашёл:");
+    Message msg3 = create_image_message(2, 42, "photo.jpg", 1920, 1080, 2621440);
+    Message msg4 = create_text_message(1, 42, "Круто! Где это?");
+    Message msg5 = create_location_message(2, 42, 55.7558, 37.6173, "Москва, Красная площадь");
+    Message msg6 = create_audio_message(1, 42, "voice_message.ogg", 45, 72000);
+    Message msg7 = create_file_message(2, 42, "document.pdf", "application/pdf", 524288);
+
+    // Массив всех сообщений
+    Message messages[] = {msg1, msg2, msg3, msg4, msg5, msg6, msg7};
+    size_t msg_count = sizeof(messages) / sizeof(messages[0]);
+
+    // Вывод чата
+    printf("=== Чат #42 ===\n");
+    for (size_t i = 0; i < msg_count; i++) {
+        message_print(&messages[i]);
+    }
+
+    // Фильтрация по типу
+    printf("\n=== Только изображения ===\n");
+    Message images[10];
+    size_t img_count = filter_messages_by_type(messages, msg_count, MSG_IMAGE, images);
+    for (size_t i = 0; i < img_count; i++) {
+        message_print(&images[i]);
+    }
+
+    printf("\n=== Только локации ===\n");
+    Message locations[10];
+    size_t loc_count = filter_messages_by_type(messages, msg_count, MSG_LOCATION, locations);
+    for (size_t i = 0; i < loc_count; i++) {
+        message_print(&locations[i]);
+    }
+
+    // Фильтрация по отправителю
+    printf("\n=== Сообщения от User#1 ===\n");
+    Message from_user1[10];
+    size_t user1_count = filter_messages_by_sender(messages, msg_count, 1, from_user1);
+    for (size_t i = 0; i < user1_count; i++) {
+        message_print(&from_user1[i]);
+    }
+
+    // Сериализация/десериализация
+    printf("\n=== Проверка сериализации ===\n");
+    unsigned char buffer[1024];
+    size_t serialized_size = message_serialize(&msg5, buffer, sizeof(buffer));
+    printf("Размер сериализованного сообщения: %zu байт\n", serialized_size);
+
+    Message deserialized;
+    if (message_deserialize(buffer, serialized_size, &deserialized) == 0) {
+        printf("Десериализованное сообщение: ");
+        message_print(&deserialized);
+    } else {
+        printf("Ошибка десериализации!\n");
+    }
+
+    return 0;
+    }
+
+<img width="979" height="507" alt="Снимок экрана 2026-03-29 184253" src="https://github.com/user-attachments/assets/f171ba20-f67c-41bd-81c3-597a7c55f8fd" />
+
 Задание 6.5: Битовые флаги
 Реализуйте систему прав доступа с использованием битовых полей и флагов.
 
 ### Код программы
 
+    #define _CRT_SECURE_NO_WARNINGS
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+    #include <windows.h>
+    
+    //  Вариант 1: Битовые флаги через enum 
+    
+    typedef enum {
+        PERM_NONE     = 0,
+        PERM_READ     = 1 << 0,  // 00001
+        PERM_WRITE    = 1 << 1,  // 00010
+        PERM_EXECUTE  = 1 << 2,  // 00100
+        PERM_DELETE   = 1 << 3,  // 01000
+        PERM_ADMIN    = 1 << 4,  // 10000
+        PERM_ALL      = PERM_READ | PERM_WRITE | PERM_EXECUTE | PERM_DELETE | PERM_ADMIN
+    } Permission;
+    
+    //  Вариант 2: Битовые поля 
+    
+    typedef struct {
+        unsigned int read     : 1;
+        unsigned int write    : 1;
+        unsigned int execute  : 1;
+        unsigned int delete   : 1;
+        unsigned int admin    : 1;
+        unsigned int reserved : 27;  // Резерв для выравнивания
+    } PermissionBits;
+    
+    //  Пользователь и ресурс 
+    
+    typedef struct {
+        unsigned int id;
+        char name[50];
+        Permission permissions;
+    } User;
+    
+    typedef struct {
+        unsigned int id;
+        char name[100];
+        Permission required_permissions;
+    } Resource;
+    
+    // Работа с правами
+    
+    void permission_add(Permission *p, Permission flag) {
+        if (p) *p = (Permission)(*p | flag);
+    }
+    
+    void permission_remove(Permission *p, Permission flag) {
+        if (p) *p = (Permission)(*p & ~flag);
+    }
+    
+    int permission_has(Permission p, Permission flag) {
+        return (p & flag) == flag;
+    }
+    
+    int permission_has_all(Permission p, Permission flags) {
+        return (p & flags) == flags;
+    }
+    
+    int permission_has_any(Permission p, Permission flags) {
+        return (p & flags) != PERM_NONE;
+    }
+    
+    //  Преобразование в строку 
+    
+    void permission_to_string(Permission p, char *buffer, size_t size) {
+        if (!buffer || size < 6) return;
+
+    buffer[0] = (p & PERM_READ)    ? 'r' : '-';
+    buffer[1] = (p & PERM_WRITE)   ? 'w' : '-';
+    buffer[2] = (p & PERM_EXECUTE) ? 'x' : '-';
+    buffer[3] = (p & PERM_DELETE)  ? 'd' : '-';
+    buffer[4] = (p & PERM_ADMIN)   ? 'a' : '-';
+    buffer[5] = '\0';
+    }
+    
+    //  Проверка доступа 
+    
+    int user_can_access(const User *user, const Resource *resource) {
+        if (!user || !resource) return 0;
+        // Пользователь имеет доступ, если у него есть ВСЕ требуемые права
+        return permission_has_all(user->permissions, resource->required_permissions);
+    }
+    
+    //  Вывод 
+    
+    void user_print(const User *user) {
+        if (!user) return;
+
+    char perm_str[10];
+    permission_to_string(user->permissions, perm_str, sizeof(perm_str));
+
+    printf("Пользователь: %s (ID: %u)\n", user->name, user->id);
+    printf("Права: %s", perm_str);
+
+    // Расшифровка прав
+    printf(" (");
+    int first = 1;
+    if (user->permissions & PERM_READ)    { printf("%sчтение", first ? "" : ", "); first = 0; }
+    if (user->permissions & PERM_WRITE)   { printf("%sзапись", first ? "" : ", "); first = 0; }
+    if (user->permissions & PERM_EXECUTE) { printf("%sвыполнение", first ? "" : ", "); first = 0; }
+    if (user->permissions & PERM_DELETE)  { printf("%sудаление", first ? "" : ", "); first = 0; }
+    if (user->permissions & PERM_ADMIN)   { printf("%sадмин", first ? "" : ", "); first = 0; }
+    if (user->permissions == PERM_NONE)   { printf("нет прав"); }
+    printf(")\n\n");
+    }
+    
+    void resource_print(const Resource *resource) {
+        if (!resource) return;
+
+    char perm_str[10];
+    permission_to_string(resource->required_permissions, perm_str, sizeof(perm_str));
+
+    printf("Ресурс: %s (ID: %u)\n", resource->name, resource->id);
+    printf("Требуемые права: %s\n\n", perm_str);
+    }
+    
+    //  Работа с битовыми полями 
+    
+    void permission_bits_init(PermissionBits *pb) {
+        if (!pb) return;
+        pb->read = pb->write = pb->execute = pb->delete = pb->admin = 0;
+        pb->reserved = 0;
+    }
+    
+    void permission_bits_set(PermissionBits *pb, Permission p) {
+        if (!pb) return;
+        pb->read    = (p & PERM_READ)    ? 1 : 0;
+        pb->write   = (p & PERM_WRITE)   ? 1 : 0;
+        pb->execute = (p & PERM_EXECUTE) ? 1 : 0;
+        pb->delete  = (p & PERM_DELETE)  ? 1 : 0;
+        pb->admin   = (p & PERM_ADMIN)   ? 1 : 0;
+    }
+    
+    Permission permission_bits_to_enum(const PermissionBits *pb) {
+        Permission p = PERM_NONE;
+        if (!pb) return p;
+
+    if (pb->read)    p |= PERM_READ;
+    if (pb->write)   p |= PERM_WRITE;
+    if (pb->execute) p |= PERM_EXECUTE;
+    if (pb->delete)  p |= PERM_DELETE;
+    if (pb->admin)   p |= PERM_ADMIN;
+    return p;
+    }
+    
+    //  Демонстрация 
+    
+    int main() {
+        SetConsoleOutputCP(CP_UTF8);
+        SetConsoleCP(CP_UTF8);
+
+    printf("=== Система прав доступа с битовыми флагами ===\n\n");
+
+    // Создаём пользователей
+    User admin = {1, "admin", PERM_ALL};
+    User editor = {2, "editor", (Permission)(PERM_READ | PERM_WRITE | PERM_EXECUTE)};
+    User viewer = {3, "viewer", PERM_READ};
+    User guest = {4, "guest", PERM_NONE};
+
+    printf("--- Пользователи ---\n");
+    user_print(&admin);
+    user_print(&editor);
+    user_print(&viewer);
+    user_print(&guest);
+
+    // Создаём ресурсы
+    Resource public_file = {1, "/data/public.txt", PERM_READ};
+    Resource edit_file = {2, "/data/edit.txt", (Permission)(PERM_READ | PERM_WRITE)};
+    Resource secret_file = {3, "/data/secret.txt", (Permission)(PERM_READ | PERM_WRITE | PERM_ADMIN)};
+    Resource exec_file = {4, "/bin/app.exe", (Permission)(PERM_READ | PERM_EXECUTE)};
+
+    printf("--- Ресурсы ---\n");
+    resource_print(&public_file);
+    resource_print(&edit_file);
+    resource_print(&secret_file);
+    resource_print(&exec_file);
+
+    // Проверка доступа
+    printf("=== Проверка доступа ===\n\n");
+
+    User* users[] = {&admin, &editor, &viewer, &guest};
+    Resource* resources[] = {&public_file, &edit_file, &secret_file, &exec_file};
+    const char* user_names[] = {"admin", "editor", "viewer", "guest"};
+
+    for (size_t r = 0; r < sizeof(resources)/sizeof(resources[0]); r++) {
+        printf("Ресурс: %s\n", resources[r]->name);
+        char req_perm[10];
+        permission_to_string(resources[r]->required_permissions, req_perm, sizeof(req_perm));
+        printf("Требуемые права: %s\n", req_perm);
+
+        for (size_t u = 0; u < sizeof(users)/sizeof(users[0]); u++) {
+            int access = user_can_access(users[u], resources[r]);
+            printf("  %s -> %s\n", user_names[u], access ? "разрешён" : "ЗАПРЕЩЁН");
+        }
+        printf("\n");
+    }
+
+    // Демонстрация операций с флагами
+    printf("=== Операции с флагами ===\n\n");
+
+    Permission user_perm = PERM_READ;
+    char perm_str[10];
+
+    printf("Начальные права: ");
+    permission_to_string(user_perm, perm_str, sizeof(perm_str));
+    printf("%s\n", perm_str);
+
+    permission_add(&user_perm, PERM_WRITE);
+    printf("После добавления WRITE: ");
+    permission_to_string(user_perm, perm_str, sizeof(perm_str));
+    printf("%s\n", perm_str);
+
+    permission_add(&user_perm, PERM_DELETE);
+    printf("После добавления DELETE: ");
+    permission_to_string(user_perm, perm_str, sizeof(perm_str));
+    printf("%s\n", perm_str);
+
+    printf("Проверка наличия WRITE: %s\n", permission_has(user_perm, PERM_WRITE) ? "да" : "нет");
+    printf("Проверка наличия ADMIN: %s\n", permission_has(user_perm, PERM_ADMIN) ? "да" : "нет");
+    printf("Проверка наличия всех (READ|WRITE): %s\n",
+           permission_has_all(user_perm, (Permission)(PERM_READ | PERM_WRITE)) ? "да" : "нет");
+    printf("Проверка наличия любого из (DELETE|ADMIN): %s\n",
+           permission_has_any(user_perm, (Permission)(PERM_DELETE | PERM_ADMIN)) ? "да" : "нет");
+
+    permission_remove(&user_perm, PERM_DELETE);
+    printf("После удаления DELETE: ");
+    permission_to_string(user_perm, perm_str, sizeof(perm_str));
+    printf("%s\n", perm_str);
+
+    // Демонстрация битовых полей
+    printf("\n=== Битовые поля ===\n\n");
+
+    PermissionBits pb;
+    permission_bits_init(&pb);
+    permission_bits_set(&pb, (Permission)(PERM_READ | PERM_WRITE | PERM_EXECUTE));
+
+    printf("Битовые поля: r=%d w=%d x=%d d=%d a=%d\n",
+           pb.read, pb.write, pb.execute, pb.delete, pb.admin);
+
+    Permission converted = permission_bits_to_enum(&pb);
+    permission_to_string(converted, perm_str, sizeof(perm_str));
+    printf("Преобразование в enum: %s\n", perm_str);
+
+    printf("Размер Permission (enum): %zu байт\n", sizeof(Permission));
+    printf("Размер PermissionBits (struct): %zu байт\n", sizeof(PermissionBits));
+
+    return 0;
+    }
+
+<img width="1089" height="953" alt="Снимок экрана 2026-03-29 184542" src="https://github.com/user-attachments/assets/feba36f3-8901-4d36-8977-891f554185e0" />
+
 Задание 6.6: Конечный автомат
 Реализуйте конечный автомат для разбора простого языка.
 
 ### Код программы
+
+    #define _CRT_SECURE_NO_WARNINGS
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+    #include <ctype.h>
+    #include <windows.h>
+    
+    //  Типы токенов 
+    
+    typedef enum {
+        TOK_NUMBER,
+        TOK_IDENTIFIER,
+        TOK_OPERATOR,
+        TOK_LPAREN,
+        TOK_RPAREN,
+        TOK_EOF,
+        TOK_ERROR
+    } TokType;
+    
+    //  Токен 
+    
+    typedef struct {
+        TokType type;
+        union {
+            double number;
+            char identifier[64];
+            char op;
+        } value;
+        int line;
+        int column;
+    } Token;
+    
+    //  Состояния лексера 
+    
+    typedef enum {
+        STATE_START,
+        STATE_IN_NUMBER,
+        STATE_IN_IDENTIFIER,
+        STATE_IN_OPERATOR,
+        STATE_ERROR,
+        STATE_DONE
+    } LexerState;
+    
+    //  Лексер 
+    
+    typedef struct {
+        const char *input;
+        size_t pos;
+        int line;
+        int column;
+        LexerState state;
+        size_t input_len;
+    } Lexer;
+    
+    //  Вспомогательные функции 
+    
+    static char current_char(const Lexer *lex) {
+        if (lex->pos >= lex->input_len) return '\0';
+        return lex->input[lex->pos];
+    }
+    
+    static char peek_char(const Lexer *lex, int offset) {
+        size_t pos = lex->pos + offset;
+        if (pos >= lex->input_len) return '\0';
+        return lex->input[pos];
+    }
+    
+    static void advance(Lexer *lex) {
+        if (lex->pos < lex->input_len) {
+            if (lex->input[lex->pos] == '\n') {
+                lex->line++;
+                lex->column = 1;
+            } else {
+                lex->column++;
+            }
+            lex->pos++;
+        }
+    }
+    
+    static int is_operator_char(char c) {
+        return c == '+' || c == '-' || c == '*' || c == '/' ||
+               c == '=' || c == '<' || c == '>' || c == '!' ||
+               c == '&' || c == '|' || c == '^' || c == '%' ||
+               c == '(' || c == ')' || c == '{' || c == '}' ||
+               c == '[' || c == ']' || c == ',' || c == ';';
+    }
+    
+    static int is_identifier_start(char c) {
+        return isalpha(c) || c == '_';
+    }
+    
+    static int is_identifier_char(char c) {
+        return isalnum(c) || c == '_';
+    }
+    
+    static int is_digit(char c) {
+        return c >= '0' && c <= '9';
+    }
+    
+    // Инициализация 
+    
+    void lexer_init(Lexer *lex, const char *input) {
+        if (!lex || !input) return;
+        lex->input = input;
+        lex->pos = 0;
+        lex->line = 1;
+        lex->column = 1;
+        lex->state = STATE_START;
+        lex->input_len = strlen(input);
+    }
+    
+    //  Пропуск пробелов 
+    
+    void lexer_skip_whitespace(Lexer *lex) {
+        while (current_char(lex) != '\0' && isspace(current_char(lex))) {
+            advance(lex);
+        }
+    }
+    
+    //  Пропуск комментариев 
+    
+    static void lexer_skip_comment(Lexer *lex) {
+        if (current_char(lex) == '/') {
+            if (peek_char(lex, 1) == '/') {
+                // Однострочный комментарий //
+                while (current_char(lex) != '\0' && current_char(lex) != '\n') {
+                    advance(lex);
+                }
+            } else if (peek_char(lex, 1) == '*') {
+                // Многострочный комментарий /* */
+                advance(lex); // пропускаем '*'
+                while (current_char(lex) != '\0') {
+                    if (current_char(lex) == '*' && peek_char(lex, 1) == '/') {
+                        advance(lex); // '/'
+                        advance(lex);
+                        return;
+                    }
+                    advance(lex);
+                }
+            }
+        }
+    }
+    
+    // Создание токенов 
+    
+    static Token make_token(TokType type, int line, int column) {
+        Token tok;
+        tok.type = type;
+        tok.line = line;
+        tok.column = column;
+        return tok;
+    }
+    
+    static Token make_number_token(double value, int line, int column) {
+        Token tok = make_token(TOK_NUMBER, line, column);
+        tok.value.number = value;
+        return tok;
+    }
+    
+    static Token make_identifier_token(const char *str, int line, int column) {
+        Token tok = make_token(TOK_IDENTIFIER, line, column);
+        strncpy(tok.value.identifier, str, sizeof(tok.value.identifier) - 1);
+        tok.value.identifier[sizeof(tok.value.identifier) - 1] = '\0';
+        return tok;
+    }
+    
+    static Token make_operator_token(char op, int line, int column) {
+        Token tok = make_token(TOK_OPERATOR, line, column);
+        tok.value.op = op;
+        return tok;
+    }
+    
+    static Token make_error_token(const char *msg, int line, int column) {
+        Token tok = make_token(TOK_ERROR, line, column);
+        strncpy(tok.value.identifier, msg, sizeof(tok.value.identifier) - 1);
+        tok.value.identifier[sizeof(tok.value.identifier) - 1] = '\0';
+        return tok;
+    }
+    
+    // Получение следующего токена 
+    
+    Token lexer_next_token(Lexer *lex) {
+        if (!lex) return make_error_token("NULL lexer", 0, 0);
+
+    while (1) {
+        // Пропускаем пробелы
+        lexer_skip_whitespace(lex);
+
+        // Пропускаем комментарии
+        lexer_skip_comment(lex);
+
+        // Если после пропуска снова пробелы - повторяем
+        if (isspace(current_char(lex))) continue;
+
+        break;
+    }
+
+    int start_line = lex->line;
+    int start_col = lex->column;
+
+    // Конец ввода
+    if (current_char(lex) == '\0') {
+        lex->state = STATE_DONE;
+        return make_token(TOK_EOF, start_line, start_col);
+    }
+
+    char c = current_char(lex);
+
+    // Числа (включая числа с плавающей точкой)
+    if (is_digit(c) || (c == '.' && is_digit(peek_char(lex, 1)))) {
+        char num_buf[64];
+        int idx = 0;
+        int has_dot = 0;
+
+        while (current_char(lex) != '\0' &&
+               (is_digit(current_char(lex)) ||
+                (current_char(lex) == '.' && !has_dot))) {
+            if (current_char(lex) == '.') has_dot = 1;
+            if (idx < (int)sizeof(num_buf) - 1) {
+                num_buf[idx++] = current_char(lex);
+            }
+            advance(lex);
+        }
+        num_buf[idx] = '\0';
+
+        lex->state = STATE_IN_NUMBER;
+        return make_number_token(atof(num_buf), start_line, start_col);
+    }
+
+    // Идентификаторы и ключевые слова
+    if (is_identifier_start(c)) {
+        char id_buf[64];
+        int idx = 0;
+
+        while (current_char(lex) != '\0' && is_identifier_char(current_char(lex))) {
+            if (idx < (int)sizeof(id_buf) - 1) {
+                id_buf[idx++] = current_char(lex);
+            }
+            advance(lex);
+        }
+        id_buf[idx] = '\0';
+
+        lex->state = STATE_IN_IDENTIFIER;
+        return make_identifier_token(id_buf, start_line, start_col);
+    }
+
+    // Операторы и скобки
+    if (is_operator_char(c)) {
+        advance(lex);
+
+        // Проверка на двухсимвольные операторы
+        char next = current_char(lex);
+        char two_char[3] = {c, next, '\0'};
+
+        int is_two_char_op = (strcmp(two_char, "==") == 0 ||
+                              strcmp(two_char, "!=") == 0 ||
+                              strcmp(two_char, "<=") == 0 ||
+                              strcmp(two_char, ">=") == 0 ||
+                              strcmp(two_char, "&&") == 0 ||
+                              strcmp(two_char, "||") == 0 ||
+                              strcmp(two_char, "++") == 0 ||
+                              strcmp(two_char, "--") == 0);
+
+        if (is_two_char_op && next != '\0') {
+            advance(lex);
+            
+            return make_operator_token(c, start_line, start_col);
+        }
+
+        // Скобки
+        if (c == '(') {
+            return make_token(TOK_LPAREN, start_line, start_col);
+        }
+        if (c == ')') {
+            return make_token(TOK_RPAREN, start_line, start_col);
+        }
+
+        lex->state = STATE_IN_OPERATOR;
+        return make_operator_token(c, start_line, start_col);
+    }
+
+    // Нераспознанный символ
+    lex->state = STATE_ERROR;
+    return make_error_token("Неизвестный символ", start_line, start_col);
+    }
+    
+    // Заглянуть в следующий токен 
+    
+    Token lexer_peek(Lexer *lex) {
+        if (!lex) return make_error_token("NULL lexer", 0, 0);
+
+    // Сохраняем состояние
+    Lexer saved = *lex;
+    Token tok = lexer_next_token(lex);
+    // Восстанавливаем состояние
+    *lex = saved;
+
+    return tok;
+    }
+    
+    //  Вывод токена 
+    
+    const char* token_type_name(TokType type) {
+        switch (type) {
+            case TOK_NUMBER:     return "NUMBER";
+            case TOK_IDENTIFIER: return "IDENTIFIER";
+            case TOK_OPERATOR:   return "OPERATOR";
+            case TOK_LPAREN:     return "LPAREN";
+            case TOK_RPAREN:     return "RPAREN";
+            case TOK_EOF:        return "EOF";
+            case TOK_ERROR:      return "ERROR";
+            default:             return "UNKNOWN";
+        }
+    }
+    
+    void token_print(const Token *tok) {
+        if (!tok) return;
+
+    switch (tok->type) {
+        case TOK_NUMBER:
+            printf("[%s] %.6g (line %d, col %d)\n",
+                   token_type_name(tok->type), tok->value.number,
+                   tok->line, tok->column);
+            break;
+        case TOK_IDENTIFIER:
+            printf("[%s] %s (line %d, col %d)\n",
+                   token_type_name(tok->type), tok->value.identifier,
+                   tok->line, tok->column);
+            break;
+        case TOK_OPERATOR:
+            printf("[%s] %c (line %d, col %d)\n",
+                   token_type_name(tok->type), tok->value.op,
+                   tok->line, tok->column);
+            break;
+        case TOK_LPAREN:
+            printf("[%s] ( (line %d, col %d)\n",
+                   token_type_name(tok->type), tok->line, tok->column);
+            break;
+        case TOK_RPAREN:
+            printf("[%s] ) (line %d, col %d)\n",
+                   token_type_name(tok->type), tok->line, tok->column);
+            break;
+        case TOK_EOF:
+            printf("[%s] (line %d, col %d)\n",
+                   token_type_name(tok->type), tok->line, tok->column);
+            break;
+        case TOK_ERROR:
+            printf("[%s] %s (line %d, col %d)\n",
+                   token_type_name(tok->type), tok->value.identifier,
+                   tok->line, tok->column);
+            break;
+    }
+    }
+    
+    //  Токенизация всей строки 
+    
+    size_t tokenize(const char *input, Token *tokens, size_t max_tokens) {
+        if (!input || !tokens || max_tokens == 0) return 0;
+
+    Lexer lex;
+    lexer_init(&lex, input);
+
+    size_t count = 0;
+    while (count < max_tokens) {
+        tokens[count] = lexer_next_token(&lex);
+        count++;
+
+        if (tokens[count - 1].type == TOK_EOF ||
+            tokens[count - 1].type == TOK_ERROR) {
+            break;
+        }
+    }
+
+    return count;
+    }
+    
+    //  Демонстрация 
+    
+    int main() {
+        SetConsoleOutputCP(CP_UTF8);
+        SetConsoleCP(CP_UTF8);
+
+    printf("=== Конечный автомат (Lexer) ===\n\n");
+
+    // Пример 1: простое выражение
+    const char *input1 = "x = 3.14 * (y + 2)";
+    printf("Вход: \"%s\"\n", input1);
+    printf("Токены:\n");
+
+    Lexer lex1;
+    lexer_init(&lex1, input1);
+    Token tok;
+    do {
+        tok = lexer_next_token(&lex1);
+        token_print(&tok);
+    } while (tok.type != TOK_EOF && tok.type != TOK_ERROR);
+
+    // Пример 2: сложное выражение с комментариями
+    printf("\n");
+    const char *input2 = "result = (a + b) * 2 // это комментарий";
+    printf("Вход: \"%s\"\n", input2);
+    printf("Токены:\n");
+
+    Lexer lex2;
+    lexer_init(&lex2, input2);
+    do {
+        tok = lexer_next_token(&lex2);
+        token_print(&tok);
+    } while (tok.type != TOK_EOF && tok.type != TOK_ERROR);
+
+    // Пример 3: многострочный комментарий
+    printf("\n");
+    const char *input3 = "x = 10 /* комментарий\nмногострочный */ + y";
+    printf("Вход: \"%s\"\n", input3);
+    printf("Токены:\n");
+
+    Lexer lex3;
+    lexer_init(&lex3, input3);
+    do {
+        tok = lexer_next_token(&lex3);
+        token_print(&tok);
+    } while (tok.type != TOK_EOF && tok.type != TOK_ERROR);
+
+    // Пример 4: токенизация в массив
+    printf("\n");
+    const char *input4 = "a + b * c - d / e";
+    printf("Вход: \"%s\"\n", input4);
+
+    Token tokens[50];
+    size_t count = tokenize(input4, tokens, sizeof(tokens) / sizeof(tokens[0]));
+
+    printf("Всего токенов: %zu\n", count);
+    printf("Токены:\n");
+    for (size_t i = 0; i < count; i++) {
+        token_print(&tokens[i]);
+    }
+
+    // Пример 5: lexer_peek
+    printf("\n");
+    const char *input5 = "x + y";
+    printf("Вход: \"%s\"\n", input5);
+
+    Lexer lex5;
+    lexer_init(&lex5, input5);
+
+    Token peeked = lexer_peek(&lex5);
+    printf("lexer_peek: ");
+    token_print(&peeked);
+
+    Token first = lexer_next_token(&lex5);
+    printf("lexer_next_token (1): ");
+    token_print(&first);
+
+    peeked = lexer_peek(&lex5);
+    printf("lexer_peek: ");
+    token_print(&peeked);
+
+    // Пример 6: ошибки
+    printf("\n");
+    const char *input6 = "x = 5 @ y";
+    printf("Вход: \"%s\"\n", input6);
+
+    Lexer lex6;
+    lexer_init(&lex6, input6);
+    do {
+        tok = lexer_next_token(&lex6);
+        token_print(&tok);
+    } while (tok.type != TOK_EOF && tok.type != TOK_ERROR);
+
+    return 0;
+    }
+<img width="975" height="505" alt="Снимок экрана 2026-03-29 184834" src="https://github.com/user-attachments/assets/1728f0c0-e17d-42cb-a259-af972b675b08" />
+
 
 # Контрольные вопросы
 
