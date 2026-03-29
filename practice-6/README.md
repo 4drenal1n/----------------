@@ -220,7 +220,7 @@
 
     return 0;
     }
-<img width="981" height="509" alt="Снимок экрана 2026-03-29 154859" src="https://github.com/user-attachments/assets/b222155c-fa47-48a1-aa86-4e0f8ec3fca3" />
+<img width="734" height="950" alt="Снимок экрана 2026-03-29 152829" src="https://github.com/user-attachments/assets/7e525502-1f60-4865-aac1-eb2314ed6bd2" />
 
 Задание 6.2: Геометрические фигуры (Tagged Union)
 Реализуйте систему для работы с различными геометрическими фигурами.
